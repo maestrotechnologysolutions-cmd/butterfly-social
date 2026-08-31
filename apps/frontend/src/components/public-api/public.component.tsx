@@ -33,7 +33,7 @@ export const PublicComponent = () => {
       <div className="text-customColor18 mt-[4px]">
         {t(
           'use_postiz_api_to_integrate_with_your_tools',
-          'Use Postiz API to integrate with your tools.'
+          'Use Butterfly Social API to integrate with your tools.'
         )}
         <br />
         <a
@@ -53,7 +53,7 @@ export const PublicComponent = () => {
         ><br />
           {t(
             'check_n8n',
-            'Check out our N8N custom node for Postiz.'
+            'Check out our N8N custom node for Butterfly Social.'
           )}
         </a>
       </div>
@@ -85,7 +85,7 @@ export const PublicComponent = () => {
       <div className="text-customColor18 mt-[4px]">
         {t(
           'connect_your_mcp_client_to_postiz_to_schedule_your_posts_faster',
-          'Connect Postiz MCP server to your client (Http streaming) to schedule your posts faster.'
+          'Connect Butterfly Social MCP server to your client (Http streaming) to schedule your posts faster.'
         )}
       </div>
       <div className="my-[16px] mt-[16px] bg-sixth border-fifth items-center border rounded-[4px] p-[24px] flex gap-[24px]">

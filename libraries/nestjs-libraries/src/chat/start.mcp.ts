@@ -14,7 +14,7 @@ export const startMcp = async (app: INestApplication) => {
   const tools = await agent.getTools();
 
   const server = new MCPServer({
-    name: 'Postiz MCP',
+    name: 'Butterfly Social MCP',
     version: '1.0.0',
     tools,
     agents: { postiz: agent },
