@@ -676,8 +676,13 @@ export const AddProviderComponent: FC<{
           className={clsx(
             isMobile && 'gap-[20px] flex flex-col',
             !isMobile &&
-              'grid grid-cols-5 gap-[10px] justify-items-center justify-center',
-            isMobile ? {} : onboarding ? 'grid-cols-9' : 'grid-cols-5'
+              // The platform grid must stay responsive: this modal is opened
+              // from regular (narrow) mobile browsers during onboarding, not
+              // just the native app (which is what `isMobile` actually
+              // detects). A fixed high column count here squeezes every
+              // icon + label into slivers that overlap the next tile.
+              'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-[10px] justify-items-center justify-center',
+            !isMobile && (onboarding ? 'lg:grid-cols-9' : 'lg:grid-cols-5')
           )}
         >
           {social
