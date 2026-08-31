@@ -1,21 +1,38 @@
 import { parse } from 'tldts';
 
+// Hosting-platform suffixes whose subdomains (e.g. *.up.railway.app,
+// *.vercel.app) are NOT resolvable via tldts's Public Suffix List lookup as
+// distinct "private" registrable domains -- verified empirically against
+// the pinned tldts@6.1.86: parsing
+// "butterfly-social-production.up.railway.app" returns publicSuffix "app",
+// isIcann true, isPrivate false, domain "railway.app" -- i.e. tldts's
+// compiled PSL data does NOT list up.railway.app on the private section at
+// all in this version, so `{ allowPrivateDomains: true }` has no effect
+// here. Falling back to plain PSL parsing for these hosts produces a
+// cookie Domain=.railway.app shared with -- and immediately
+// rejected/invalidated by -- every other Railway-hosted app, not just ours.
+// Verified live: this broke session cookies end-to-end on the platform's
+// default *.up.railway.app domain (register succeeded, but the very next
+// authenticated request came back 401 with the cookie cleared).
+const PLATFORM_SUBDOMAIN_SUFFIXES = [
+  '.up.railway.app',
+  '.vercel.app',
+  '.netlify.app',
+  '.github.io',
+  '.fly.dev',
+  '.onrender.com',
+];
+
 export function getCookieUrlFromDomain(domain: string) {
-  // allowPrivateDomains is required for correctness on hosting platforms
-  // whose own subdomain (railway.app, vercel.app, github.io, etc.) is only
-  // registered on the PRIVATE section of the Public Suffix List, not the
-  // ICANN section that tldts consults by default. Without it, a deploy on
-  // e.g. butterfly-social-production.up.railway.app parses as domain
-  // "railway.app" (since only the ICANN-registered ".app" is recognized),
-  // producing a cookie Domain=.railway.app that's shared with -- and
-  // rejected/immediately invalidated by -- every other Railway-hosted app,
-  // not just ours. Verified live: this broke session cookies end-to-end on
-  // the platform's default *.up.railway.app domain (register succeeded,
-  // but the very next authenticated request came back 401 with the cookie
-  // cleared). With allowPrivateDomains, the exact platform subdomain is
-  // recognized as its own private "domain", so the cookie is correctly
-  // scoped to just this deployment's host. On a real custom domain (e.g.
-  // app.example.com) behavior is unchanged from before.
   const url = parse(domain, { allowPrivateDomains: true });
-  return url.domain! ? '.' + url.domain! : url.hostname!;
+  const hostname = url.hostname!;
+
+  if (PLATFORM_SUBDOMAIN_SUFFIXES.some((suffix) => hostname.endsWith(suffix))) {
+    // Use the exact host, no leading dot: this scopes the cookie to just
+    // this one deployment instead of tldts's (wrong, for these hosts)
+    // registered-domain guess.
+    return hostname;
+  }
+
+  return url.domain! ? '.' + url.domain! : hostname;
 }
