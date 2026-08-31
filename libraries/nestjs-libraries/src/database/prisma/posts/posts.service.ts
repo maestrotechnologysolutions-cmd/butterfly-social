@@ -1359,4 +1359,5 @@ export class PostsService {
   ) {
     return this._postRepository.createComment(orgId, userId, postId, comment);
   }
+
 }
