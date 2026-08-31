@@ -360,6 +360,18 @@ export const LaunchesComponent = () => {
   const t = useT();
   const [reload, setReload] = useState(false);
   const [collapseMenu, setCollapseMenu] = useCookie('collapseMenu', '0');
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const update = () => setIsMobileViewport(mediaQuery.matches);
+    update();
+    mediaQuery.addEventListener('change', update);
+    return () => mediaQuery.removeEventListener('change', update);
+  }, []);
+  // On narrow viewports the sidebar always renders collapsed (icon-only) so it
+  // doesn't fight the calendar for horizontal space, without overwriting the
+  // user's desktop collapse preference stored in the cookie.
+  const isSidebarCollapsed = collapseMenu === '1' || isMobileViewport;
   const [mode] = useCookie('mode', 'dark');
   const { isLoading, data: integrations, mutate } = useIntegrationList();
 
@@ -499,8 +511,8 @@ export const LaunchesComponent = () => {
       <CalendarWeekProvider integrations={sortedIntegrations}>
         <div
           className={clsx(
-            'flex relative flex-col',
-            collapseMenu === '1' ? 'group sidebar w-[100px]' : 'w-[260px]'
+            'flex relative flex-col shrink-0',
+            isSidebarCollapsed ? 'group sidebar w-[100px] max-md:w-[72px]' : 'w-[260px]'
           )}
         >
           <div
@@ -514,7 +526,7 @@ export const LaunchesComponent = () => {
               </h2>
               <div
                 onClick={() =>
-                  setCollapseMenu(collapseMenu === '1' ? '0' : '1')
+                  setCollapseMenu(collapseMenu === '1' ? '0' : '1')  // desktop-only manual toggle; mobile always forces collapsed via isSidebarCollapsed
                 }
                 className="group-[.sidebar]:rotate-[180deg] group-[.sidebar]:mx-auto text-btnText bg-btnSimple rounded-[6px] w-[24px] h-[24px] flex items-center justify-center cursor-pointer select-none"
               >
@@ -545,7 +557,7 @@ export const LaunchesComponent = () => {
               </div>
             </div>
             <div className="gap-[32px] flex flex-col select-none flex-1">
-              {sortedIntegrations.length === 0 && collapseMenu === '0' && (
+              {sortedIntegrations.length === 0 && !isSidebarCollapsed && (
                 <div className="flex-1 max-h-[500px] justify-center items-center flex">
                   <div className="flex flex-col gap-[12px] text-center">
                     <img
@@ -568,7 +580,7 @@ export const LaunchesComponent = () => {
               )}
               {menuIntegrations.map((menu) => (
                 <MenuGroupComponent
-                  collapsed={collapseMenu === '1'}
+                  collapsed={isSidebarCollapsed}
                   changeItemGroup={changeItemGroup}
                   key={menu.name}
                   group={menu}
