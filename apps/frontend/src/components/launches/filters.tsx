@@ -289,7 +289,7 @@ export const Filters = () => {
   return (
     <div className="text-textColor flex flex-col md:flex-row gap-[8px] items-center select-none">
       {!isListView && (
-        <div className="flex flex-grow flex-row items-center gap-[10px]">
+        <div className="flex flex-grow min-w-0 flex-row items-center gap-[10px]">
           <div className="border h-[42px] border-newTableBorder bg-newTableBorder gap-[1px] flex items-center rounded-[8px] overflow-hidden">
             <div
               onClick={previous}
@@ -311,7 +311,7 @@ export const Filters = () => {
                 />
               </svg>
             </div>
-            <div className="min-w-[200px] text-center bg-newBgColorInner h-full flex items-center justify-center">
+            <div className="min-w-0 flex-1 max-md:text-[12px] text-center bg-newBgColorInner h-full flex items-center justify-center px-[6px]">
               <div className="py-[3px] px-[9px] rounded-[5px] transition-all text-[14px]">
                 {getDisplayText()}
               </div>
@@ -350,7 +350,7 @@ export const Filters = () => {
         </div>
       )}
       {isListView && (
-        <div className="flex flex-grow flex-row items-center gap-[10px]">
+        <div className="flex flex-grow min-w-0 flex-row items-center gap-[10px]">
           <div className="border h-[42px] border-newTableBorder bg-newTableBorder gap-[1px] flex items-center rounded-[8px] overflow-hidden">
             <div
               onClick={previousPage}
@@ -377,7 +377,7 @@ export const Filters = () => {
                 />
               </svg>
             </div>
-            <div className="min-w-[200px] text-center bg-newBgColorInner h-full flex items-center justify-center">
+            <div className="min-w-0 flex-1 max-md:text-[12px] text-center bg-newBgColorInner h-full flex items-center justify-center px-[6px]">
               <div className="py-[3px] px-[9px] rounded-[5px] transition-all text-[14px]">
                 {t('page', 'Page')} {calendar.listPage + 1} {t('of', 'of')} {Math.max(1, calendar.listTotalPages)}
               </div>
