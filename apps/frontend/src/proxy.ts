@@ -47,7 +47,15 @@ export async function proxy(request: NextRequest) {
     nextUrl.pathname.startsWith('/uploads/') ||
     nextUrl.pathname.startsWith('/p/') ||
     nextUrl.pathname.startsWith('/provider/') ||
-    nextUrl.pathname.startsWith('/icons/')
+    nextUrl.pathname.startsWith('/icons/') ||
+    // The connect-bridge popup route is deliberately opened by an external
+    // app (Butterfly) BEFORE the visitor has any Postiz/Butterfly Social auth
+    // cookie -- that's the entire point of the flow (register-or-login, then
+    // postMessage the resulting API key back to the opener). Without this
+    // exemption, the site-wide auth gate below redirects every unauthenticated
+    // request to /auth, stripping the popup flow's own UI/logic and making
+    // it unreachable.
+    nextUrl.pathname.startsWith('/connect-bridge')
   ) {
     return topResponse;
   }
