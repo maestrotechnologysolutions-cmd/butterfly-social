@@ -40,7 +40,7 @@ export const startMcp = async (app: INestApplication) => {
   };
 
   const mastra = await mastraService.mastra();
-  const agent = mastra.getAgent('postiz');
+  const agent = mastra.getAgent('butterfly-social');
   const tools = await agent.listTools();
 
   // The Claude connector directory does not accept AI media generation tools,
