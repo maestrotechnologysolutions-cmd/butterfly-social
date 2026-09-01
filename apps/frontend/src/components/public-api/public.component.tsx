@@ -373,23 +373,23 @@ const McpSection = ({
 
 const localCliSteps = [
   {
-    label: 'Install the CLI',
-    code: 'npm install -g postiz',
+    label: 'Install the Node SDK',
+    code: 'npm install @postiz/node',
   },
   {
-    label: 'Run: postiz auth:login',
-    code: 'postiz auth:login',
+    label: 'Create a client with your API key',
+    code: 'import { Postiz } from "@postiz/node";\nconst client = new Postiz({ apiKey: "{API_KEY}" });',
   },
   {
     label: 'Install the Butterfly Social skill for your AI agent',
-    code: 'npx skills add gitroomhq/postiz-agent',
+    code: 'npx skills add maestrotechnologysolutions-cmd/butterfly-social',
   },
 ] as const;
 
 const ciCliSteps = [
   {
-    label: 'Install the CLI',
-    code: 'npm install -g postiz',
+    label: 'Install the Node SDK',
+    code: 'npm install @postiz/node',
   },
   {
     label: 'Set your API key as an environment variable',
@@ -397,7 +397,7 @@ const ciCliSteps = [
   },
   {
     label: 'Install the Butterfly Social skill for your AI agent',
-    code: 'npx skills add gitroomhq/postiz-agent',
+    code: 'npx skills add maestrotechnologysolutions-cmd/butterfly-social',
   },
 ] as const;
 
