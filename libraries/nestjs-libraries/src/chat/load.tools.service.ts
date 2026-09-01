@@ -43,8 +43,8 @@ export class LoadToolsService {
   async agent() {
     const tools = await this.loadTools();
     return new Agent({
-      id: 'postiz',
-      name: 'postiz',
+      id: 'butterfly-social',
+      name: 'butterfly-social',
       description: 'Agent that helps schedule and list social media posts for users',
       instructions: ({ requestContext }) => {
         const ui: string = requestContext.get('ui' as never);
