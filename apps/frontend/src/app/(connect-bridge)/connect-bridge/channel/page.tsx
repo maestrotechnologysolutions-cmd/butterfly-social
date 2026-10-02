@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || '';
 
 // Deep-links straight to a provider's OAuth screen so an external app
-// (Butterfly's Hermes agent) can send a user to "connect <platform>" without
+// (Butterfly's agent) can send a user to "connect <platform>" without
 // making them find the right button in the dashboard first.
 export default function ConnectChannelPage() {
   const [message, setMessage] = useState('Opening sign-in...');
