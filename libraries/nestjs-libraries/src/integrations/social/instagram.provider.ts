@@ -29,6 +29,7 @@ export class InstagramProvider
   implements SocialProvider
 {
   identifier = 'instagram';
+  refreshCron = true;
   name = 'Instagram\n(Facebook Business)';
   isBetweenSteps = true;
   toolTip = 'Instagram must be business and connected to a Facebook page';
@@ -87,12 +88,36 @@ export class InstagramProvider
   }
 
   async refreshToken(refresh_token: string): Promise<AuthTokenDetails> {
+    // Instagram (via Facebook login) tokens are Facebook long-lived tokens
+    // stored in both token fields at connect time — refresh them through the
+    // same fb_exchange_token grant the Facebook provider uses.
+    const response = await (
+      await fetch(
+        `https://graph.facebook.com/${META_GRAPH_API_VERSION}/oauth/access_token` +
+          '?grant_type=fb_exchange_token' +
+          `&client_id=${process.env.FACEBOOK_APP_ID}` +
+          `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
+          `&fb_exchange_token=${refresh_token}&fields=access_token,expires_in`
+      )
+    ).json();
+
+    if (!response?.access_token) {
+      // refreshProcess catches this, flags the integration refreshNeeded and
+      // notifies the org — the same path as every other failed refresh.
+      throw new Error(
+        `Instagram token refresh failed: ${JSON.stringify(response)?.slice(
+          0,
+          300
+        )}`
+      );
+    }
+
     return {
-      refreshToken: '',
-      expiresIn: 0,
-      accessToken: '',
       id: '',
       name: '',
+      accessToken: response.access_token,
+      refreshToken: response.access_token,
+      expiresIn: dayjs().add(59, 'days').unix() - dayjs().unix(),
       picture: '',
       username: '',
     };

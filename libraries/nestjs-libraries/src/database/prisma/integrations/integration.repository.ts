@@ -405,6 +405,19 @@ export class IntegrationRepository {
     });
   }
 
+  getAllIntegrationsForRefreshCatchup() {
+    return this._integration.model.integration.findMany({
+      where: {
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        organizationId: true,
+        providerIdentifier: true,
+      },
+    });
+  }
+
   async setBetweenRefreshSteps(id: string) {
     return this._integration.model.integration.update({
       where: {

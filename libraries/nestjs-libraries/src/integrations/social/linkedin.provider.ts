@@ -59,6 +59,10 @@ export class LinkedinProvider extends SocialAbstract implements SocialProvider {
   identifier = 'linkedin';
   name = 'LinkedIn';
   oneTimeToken = true;
+  // LinkedIn member tokens live 60 days and the refresh token 365 — the
+  // refreshToken() implementation below is real, so opt into the Temporal
+  // refresh workflow (LinkedinPageProvider inherits this flag).
+  refreshCron = true;
 
   isBetweenSteps = false;
   scopes = [

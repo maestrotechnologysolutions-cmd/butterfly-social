@@ -30,6 +30,7 @@ export const META_GRAPH_API_VERSION = 'v25.0';
 )
 export class FacebookProvider extends SocialAbstract implements SocialProvider {
   identifier = 'facebook';
+  refreshCron = true;
   name = 'Facebook Page';
   isBetweenSteps = true;
   scopes = [
@@ -226,12 +227,38 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
   }
 
   async refreshToken(refresh_token: string): Promise<AuthTokenDetails> {
+    // At connect time the long-lived user token is stored in BOTH token
+    // fields, so `refresh_token` here IS the current access token. Exchanging
+    // it for a fresh long-lived token keeps Meta's ~60-day cycle rolling
+    // without user re-authentication (works while the token is unexpired and
+    // the user has engaged with the app within the last 90 days).
+    const response = await (
+      await fetch(
+        `https://graph.facebook.com/${META_GRAPH_API_VERSION}/oauth/access_token` +
+          '?grant_type=fb_exchange_token' +
+          `&client_id=${process.env.FACEBOOK_APP_ID}` +
+          `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
+          `&fb_exchange_token=${refresh_token}&fields=access_token,expires_in`
+      )
+    ).json();
+
+    if (!response?.access_token) {
+      // refreshProcess catches this, flags the integration refreshNeeded and
+      // notifies the org — the same path as every other failed refresh.
+      throw new Error(
+        `Facebook token refresh failed: ${JSON.stringify(response)?.slice(
+          0,
+          300
+        )}`
+      );
+    }
+
     return {
-      refreshToken: '',
-      expiresIn: 0,
-      accessToken: '',
       id: '',
       name: '',
+      accessToken: response.access_token,
+      refreshToken: response.access_token,
+      expiresIn: dayjs().add(59, 'days').unix() - dayjs().unix(),
       picture: '',
       username: '',
     };
