@@ -34,6 +34,8 @@ export default function ConnectBridgePage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [company, setCompany] = useState('');
+  const [manualKey, setManualKey] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const params = useMemo(() => {
     if (typeof window === 'undefined') return { origin: '', state: '' };
@@ -61,9 +63,11 @@ export default function ConnectBridgePage() {
         'Your account has no API key yet. Please contact support.'
       );
     }
-    if (!callerOriginValid || typeof window === 'undefined') {
-      // Nothing to post back to — just show success so the user can close
-      // the window manually (e.g. someone opened this route directly).
+    if (!callerOriginValid || typeof window === 'undefined' || !window.opener) {
+      // Nowhere to post the key to (unrecognized referrer, direct visit, or a
+      // browser that dropped the opener). Show it so the user can paste it
+      // into the app manually instead of losing it.
+      setManualKey(apiKey);
       setStatus('success');
       return;
     }
@@ -144,11 +148,35 @@ export default function ConnectBridgePage() {
   if (status === 'success') {
     return (
       <div className="flex min-h-screen items-center justify-center p-8 text-center">
-        <div>
+        <div className="w-full max-w-[380px]">
           <h1 className="text-[24px] font-[600] mb-[8px]">Connected</h1>
-          <p className="text-[14px] opacity-70">
-            You can close this window now.
-          </p>
+          {manualKey ? (
+            <>
+              <p className="text-[14px] opacity-70 mb-[12px]">
+                This is your Butterfly Social API key. Copy it and paste it in
+                your app under Connections &rarr; Butterfly Social.
+              </p>
+              <code className="block break-all rounded-[8px] border px-[12px] py-[10px] text-[13px] text-left select-all">
+                {manualKey}
+              </code>
+              <button
+                type="button"
+                className="mt-[12px] w-full rounded-[8px] px-[12px] py-[10px] bg-white text-black font-[600]"
+                onClick={() => {
+                  navigator.clipboard?.writeText(manualKey).then(
+                    () => setCopied(true),
+                    () => {}
+                  );
+                }}
+              >
+                {copied ? 'Copied' : 'Copy key'}
+              </button>
+            </>
+          ) : (
+            <p className="text-[14px] opacity-70">
+              You can close this window now.
+            </p>
+          )}
         </div>
       </div>
     );
